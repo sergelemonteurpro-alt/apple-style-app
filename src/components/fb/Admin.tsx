@@ -15,7 +15,7 @@ import { initials, date, time } from "./util";
 
 const roles: Record<Role, string> = { admin: "Administrateur", chef: "Chef de service", agent: "Agent" };
 
-function UserForm({ user, onClose }: { user?: User; onClose: (created?: string) => void }) {
+function UserForm({ user, onClose }: { user?: User | undefined; onClose: (created?: string) => void }) {
   const { services, createUser, updateUser } = useStore();
   const [f, setF] = useState({ name: user?.name ?? "", title: user?.title ?? "", username: user?.username ?? "", password: "", role: user?.role ?? ("agent" as Role), serviceId: user?.serviceId ?? services[0]?.id ?? null });
   const [err, setErr] = useState<string | null>(null);
