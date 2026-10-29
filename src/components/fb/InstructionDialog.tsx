@@ -8,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export function InstructionDialog({ source, convId, onClose }: { source?: Message; convId?: string; onClose: () => void }) {
-  const { me, users, conversations, createInstruction } = useStore();
-  const conv = conversations.find((c) => c.id === convId);
-  const eligible = users.filter((u) => !u.revoked && u.id !== me!.id && (!conv || conv.members.includes(u.id)));
+  const { me, users, myConversations, createInstruction } = useStore();
+  const conv = myConversations().find((c) => c.id === convId);
+  const eligible = users.filter((u) => !u.revoked && u.id !== me!.id && (!conv || conv.memberIds.includes(u.id)));
   const [title, setTitle] = useState("");
   const [body, setBody] = useState(source?.text ?? "");
   const [deadline, setDeadline] = useState("");
@@ -20,7 +20,7 @@ export function InstructionDialog({ source, convId, onClose }: { source?: Messag
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl sm:max-w-lg">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-2xl sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Nouvelle instruction</DialogTitle>
           <DialogDescription>Les destinataires devront en accuser réception.</DialogDescription>
