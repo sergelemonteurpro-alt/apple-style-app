@@ -6,8 +6,8 @@ export type Message = { id: string; convId: string; authorId: string; text: stri
 export type Conversation = { id: string; name: string; members: string[] };
 export type AckStatus = "en_attente" | "recu" | "lu";
 export type Instruction = {
-  id: string; title: string; body: string; sourceMessageId?: string; convId?: string;
-  authorId: string; recipients: Record<string, AckStatus>; deadline?: string; createdAt: number; closed: boolean;
+  id: string; title: string; body: string; sourceMessageId?: string | undefined; convId?: string | undefined;
+  authorId: string; recipients: Record<string, AckStatus>; deadline?: string | undefined; createdAt: number; closed: boolean;
 };
 export type AuditEntry = { at: number; actorId: string; action: string };
 
