@@ -18,10 +18,10 @@ export function Instructions() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="mx-auto max-w-4xl px-6 py-8">
-        <div className="mb-8 flex items-end justify-between">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-6 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight">Instructions</h2>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Instructions</h2>
             <p className="mt-1 text-sm text-muted-foreground">Suivi des consignes et des accusés de réception</p>
           </div>
           {canIssue(me) && <Button onClick={() => setOpen(true)} className="rounded-full"><Plus className="h-4 w-4" /> Nouvelle</Button>}
@@ -42,7 +42,7 @@ export function Instructions() {
             const myStatus = i.recipients[me!.id];
             const late = i.deadline && !i.closed && new Date(i.deadline + "T23:59") < new Date();
             return (
-              <li key={i.id} className="rounded-2xl border bg-card p-6 shadow-sm">
+              <li key={i.id} className="rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

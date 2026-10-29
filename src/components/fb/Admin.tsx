@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserX, UserCheck, History, RotateCcw, UserPlus, QrCode, Pencil, Building2, Plus } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useStore, encodeEnroll, type Role, type User } from "@/lib/store";
@@ -16,7 +16,7 @@ import { initials, date, time } from "./util";
 const roles: Record<Role, string> = { admin: "Administrateur", chef: "Chef de service", agent: "Agent" };
 
 function UserForm({ user, onClose }: { user?: User; onClose: (created?: string) => void }) {
-  const { services, createUser, updateUser, users } = useStore();
+  const { services, createUser, updateUser } = useStore();
   const [f, setF] = useState({ name: user?.name ?? "", title: user?.title ?? "", username: user?.username ?? "", password: "", role: user?.role ?? ("agent" as Role), serviceId: user?.serviceId ?? services[0]?.id ?? null });
   const [err, setErr] = useState<string | null>(null);
   const set = (k: keyof typeof f) => (v: string) => setF((x) => ({ ...x, [k]: v }));
@@ -26,7 +26,7 @@ function UserForm({ user, onClose }: { user?: User; onClose: (created?: string) 
       ? updateUser(user.id, { name: data.name, title: data.title, username: data.username, role: data.role, serviceId: data.serviceId, ...(f.password ? { password: f.password } : {}) })
       : createUser(data);
     if (e) return setErr(e);
-    onClose(user ? undefined : users.length ? f.username.trim().toLowerCase() : undefined);
+    onClose(user ? undefined : f.username.trim().toLowerCase());
   };
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
@@ -97,6 +97,13 @@ export function Admin() {
   const [svcName, setSvcName] = useState("");
   const name = (id: string) => users.find((u) => u.id === id)?.name ?? "Système";
   const groups = [...services.map((s) => ({ id: s.id as string | null, name: s.name })), { id: null, name: "Administration" }];
+  const [pendingQr, setPendingQr] = useState<string | null>(null);
+  // Open the QR right after enrolling a new agent.
+  useEffect(() => {
+    if (!pendingQr) return;
+    const nu = users.find((u) => u.username === pendingQr);
+    if (nu) { setQr(nu.id); setPendingQr(null); }
+  }, [pendingQr, users]);
   const qrUser = users.find((u) => u.id === qr);
 
   return (
@@ -176,16 +183,9 @@ export function Admin() {
           ))}
         </ul>
       </div>
-      {form && <UserForm user={form.user} onClose={(created) => {
-        setForm(null);
-        if (created) { const nu = useStoreUsersRef.current?.find((u) => u.username === created); if (nu) setQr(nu.id); }
-      }} />}
+      {form && <UserForm user={form.user} onClose={(created) => { setForm(null); if (created) setPendingQr(created); }} />}
       {qrUser && <QrDialog user={qrUser} onClose={() => setQr(null)} />}
-      <UsersRef users={users} />
     </div>
   );
 }
 
-// Keeps a ref to the latest users so the QR for a just-created agent can open right away.
-const useStoreUsersRef: { current: User[] | null } = { current: null };
-function UsersRef({ users }: { users: User[] }) { useStoreUsersRef.current = users; return null; }
